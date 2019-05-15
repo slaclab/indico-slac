@@ -67,7 +67,7 @@ def main():
             elif line.startswith("STORAGE_BACKENDS"):
                 # this go to data instead
                 line = line.replace(args.root_path, args.dst_path+"/data")
-        cfg.write(line + '\n')
+            cfg.write(line + '\n')
 
 if __name__ == "__main__":
     main()

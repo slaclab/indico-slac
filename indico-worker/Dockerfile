@@ -16,6 +16,7 @@ RUN apt-get update && \
     apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
     apt-get install --assume-yes --no-install-recommends python-virtualenv && \
+    apt-get install --assume-yes --no-install-recommends procps && \
     apt-get autoclean && \
     apt-get clean
 
