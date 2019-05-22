@@ -1,0 +1,19 @@
+version: "2"
+
+services:
+
+  indico-db:
+    build: ./indico-db
+    image: indico-db:latest
+
+  indico-latex:
+    build: ./indico-latex
+    image: indico-latex:latest
+
+  indico-worker:
+    build: ./indico-worker
+    image: indico-worker:latest
+
+  indico-httpd:
+    build: ./indico-httpd
+    image: indico-httpd:latest
