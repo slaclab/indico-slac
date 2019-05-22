@@ -1,7 +1,7 @@
 # https://docs.getindico.io/en/latest/installation/production/debian/apache/
 
 # Based on image which includes LaTeX
-FROM indico-latex:stable
+FROM indico-latex:latest
 
 MAINTAINER salnikov@slac.stanford.edu
 
