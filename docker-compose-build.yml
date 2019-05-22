@@ -4,16 +4,16 @@ services:
 
   indico-db:
     build: ./indico-db
-    image: indico-db:latest
+    image: fermented/indico-db:latest
 
   indico-latex:
     build: ./indico-latex
-    image: indico-latex:latest
+    image: fermented/indico-latex:latest
 
   indico-worker:
     build: ./indico-worker
-    image: indico-worker:latest
+    image: fermented/indico-worker:latest
 
   indico-httpd:
     build: ./indico-httpd
-    image: indico-httpd:latest
+    image: fermented/indico-httpd:latest
