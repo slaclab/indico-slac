@@ -9,7 +9,7 @@ services:
       edu.stanford.slac.indico.role: "Redis service for Indico"
 
   indico-db:
-    image: fermented/indico-db:latest
+    image: fermented/indico-db:stable
     ports:
       - 5432:5432
     volumes:
@@ -19,7 +19,7 @@ services:
       edu.stanford.slac.indico.role: "Postgres database for Indico"
 
   indico-worker:
-    image: fermented/indico-worker:latest
+    image: fermented/indico-worker:stable
     links:
       - "indico-db:indico-db"
       - "indico-redis:indico-redis"
@@ -30,7 +30,7 @@ services:
       edu.stanford.slac.indico.role: "Indico worker"
 
   indico-httpd:
-    image: fermented/indico-httpd:latest
+    image: fermented/indico-httpd:stable
     ports:
       - 80:80
       - 443:443
