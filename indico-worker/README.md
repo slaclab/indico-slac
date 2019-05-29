@@ -10,6 +10,20 @@ customized version of `indico setup wizard` script which generates default
 configuration files. Obviously these configuration files need to be updated
 for specific setup, the instructions for that are included below.
 
+User account
+------------
+
+The image is built to run with UID=1000 and GID=1000 internally (and user
+name `indico` which does not really matter). Container needs to access host
+directories to read and write some files as explained in the section below.
+To allow access to host folders there are two options:
+- allow read/write access to those directories for UID=1000
+- run containers with different UID which has read/write access on host system
+
+For latter option one needs to pass `--user UID` option to docker run,
+examples below assume that host system has an `indico` user account and that
+account has correct priviledges for accessing bound directories.
+
 Volumes
 -------
 
@@ -33,6 +47,7 @@ will look like this:
 
     # -v option has format "<host dir>:<container dir>"
     docker run ... \
+        --user $(id -u indico) \
         --volume /shared/files/indico-data:/opt/indico/data \
         --volume /local/files/indico-scratch:/opt/indico/scratch \
         fermented/indico-worker
@@ -52,6 +67,7 @@ directory:
 
     mkdir /shared/files/indico-data
     docker run --rm \
+        --user $(id -u indico) \
         --volume /shared/files/indico-data:/opt/indico/data \
         fermented/indico-worker make-config
 
@@ -75,8 +91,10 @@ database container name is `indico-db` (this also corresponds to the name of
 database server in config file) the command to initialize database is:
 
     docker run --rm \
+        --user $(id -u indico) \
         --link indico-db \
         --volume /shared/files/indico-data:/opt/indico/data \
+        --volume /local/files/indico-scratch:/opt/indico/scratch \
         fermented/indico-worker indico db prepare
 
 Running worker
@@ -91,6 +109,7 @@ redis server have to be running too and they are linked:
 
     docker run --rm --detach \
         --name indico-worker \
+        --user $(id -u indico) \
         --link indico-db \
         --link indico-redis \
         --volume /shared/files/indico-data:/opt/indico/data \
@@ -108,7 +127,8 @@ Celery worker job is started in the same way as regular worker but it needs an
 explicit `celery` argument instead of `run` (and different container name):
 
     docker run --rm --detach \
-        -- name indico-celery \
+        --name indico-celery \
+        --user $(id -u indico) \
         --link indico-db \
         --link indico-redis \
         --volume /shared/files/indico-data:/opt/indico/data \
