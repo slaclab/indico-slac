@@ -31,7 +31,7 @@ RUN groupadd --gid ${INDICO_GID} ${INDICO_GROUP} && \
 
 # install indico from PyPI (and clean pip cache)
 RUN su --login -c "cd /home/${INDICO_USER} && \
-    python -m virtualenv indico-venv && \
+    python -m virtualenv --system-site-packages indico-venv && \
     . ./indico-venv/bin/activate && \
     pip install --no-cache-dir -U pip setuptools && \
     pip install --no-cache-dir indico==${INDICO_VERSION} indico-plugins && \
