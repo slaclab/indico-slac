@@ -15,6 +15,7 @@ ENV INDICO_GID=1000
 RUN apt-get update && \
     apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
+    apt-get install -y python-ldap && \
     apt-get install --assume-yes --no-install-recommends python-virtualenv && \
     apt-get install --assume-yes --no-install-recommends procps && \
     apt-get autoclean && \
@@ -33,7 +34,7 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
     python -m virtualenv indico-venv && \
     . ./indico-venv/bin/activate && \
     pip install --no-cache-dir -U pip setuptools && \
-    pip install --no-cache-dir indico==${INDICO_VERSION} indico-plugins python-ldap && \
+    pip install --no-cache-dir indico==${INDICO_VERSION} indico-plugins && \
     rm -rf .cache" \
     ${INDICO_USER}
 
