@@ -51,8 +51,8 @@ COPY ./uwsgi-indico.ini /etc/uwsgi.ini
 
 USER ${INDICO_USER}
 
-RUN mkdir -p ${INDICO_DIR}/web ${INDICO_DIR}/web/assets && \
-    cp -rL --preserve=all /home/${INDICO_USER}/indico/web/htdocs ${INDICO_DIR}/web && \
+# web folder hass to be world-writable
+RUN mkdir -p ${INDICO_DIR}/web && chmod o+w ${INDICO_DIR}/web && \
     mkdir -p ${INDICO_DIR}/data ${INDICO_DIR}/scratch
 
 #

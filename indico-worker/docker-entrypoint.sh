@@ -46,6 +46,10 @@ EOWARN
 fi
 
 if [ "$1" = "run" ]; then
+    # populate web/ folder
+    mkdir -p ${INDICO_DIR}/web
+    cp -rL --preserve=all /home/${INDICO_USER}/indico/web/htdocs ${INDICO_DIR}/web
+
     exec /usr/bin/uwsgi --ini /etc/uwsgi.ini
 elif [ "$1" = "celery" ]; then
     exec indico celery worker -B
