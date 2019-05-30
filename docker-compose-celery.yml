@@ -2,56 +2,17 @@ version: "2"
 
 services:
 
-  indico-redis:
-    image: redis:alpine
-    labels:
-      edu.stanford.slac.indico.service: redis
-      edu.stanford.slac.indico.role: "Redis service for Indico"
-
-  indico-db:
-    image: fermented/indico-db:stable
-    ports:
-      - 5432:5432
-    volumes:
-      - /home/salnikov/docker/volumes/postgres:/var/lib/postgresql/data
-    labels:
-      edu.stanford.slac.indico.service: database
-      edu.stanford.slac.indico.role: "Postgres database for Indico"
-
-  indico-worker:
-    image: fermented/indico-worker:stable
-    links:
-      - "indico-db:indico-db"
-      - "indico-redis:indico-redis"
-    volumes:
-       - /home/salnikov/indico-data:/opt/indico/data
-    labels:
-      edu.stanford.slac.indico.service: worker
-      edu.stanford.slac.indico.role: "Indico worker"
-
-  indico-httpd:
-    image: fermented/indico-httpd:stable
-    ports:
-      - 80:80
-      - 443:443
-    volumes_from:
-      - indico-worker
-    links:
-      - "indico-worker:indico-worker"
-    volumes:
-      - "/home/salnikov/indico/ssl:/etc/ssl/indico"
-    labels:
-      edu.stanford.slac.indico.service: httpd
-      edu.stanford.slac.indico.role: "Web server for Indico"
-
   indico-celery:
     image: fermented/indico-worker:stable
     command: celery
+    depends_on:
+      - indico-db
     links:
       - "indico-db:indico-db"
       - "indico-redis:indico-redis"
     volumes_from:
       - indico-worker
+    user: ${WORKER_USER}
     labels:
       edu.stanford.slac.indico.service: celery
       edu.stanford.slac.indico.role: "Indico celery service"

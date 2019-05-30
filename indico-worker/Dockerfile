@@ -49,12 +49,6 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
 
 COPY ./uwsgi-indico.ini /etc/uwsgi.ini
 
-USER ${INDICO_USER}
-
-# web folder hass to be world-writable
-RUN mkdir -p ${INDICO_DIR}/web && chmod o+w ${INDICO_DIR}/web && \
-    mkdir -p ${INDICO_DIR}/data ${INDICO_DIR}/scratch
-
 #
 #  - scratch is folder for tmp, cache, and log
 #  - web is folder for htdocs and assets

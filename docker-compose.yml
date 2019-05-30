@@ -10,36 +10,42 @@ services:
 
   indico-db:
     image: fermented/indico-db:stable
-    ports:
-      - 5432:5432
+#    ports:
+#      - 5432:5432
     volumes:
-      - /home/salnikov/docker/volumes/postgres:/var/lib/postgresql/data
+      - /opt/indico/docker/postgres:/var/lib/postgresql/data
     labels:
       edu.stanford.slac.indico.service: database
       edu.stanford.slac.indico.role: "Postgres database for Indico"
 
   indico-worker:
     image: fermented/indico-worker:stable
+    depends_on:
+      - indico-redis
+      - indico-db
     links:
       - "indico-db:indico-db"
       - "indico-redis:indico-redis"
     volumes:
-       - /home/salnikov/indico-data:/opt/indico/data
+       - /opt/indico/docker/data:/opt/indico/data
+       - /opt/indico/docker/scratch:/opt/indico/scratch
+    user: ${WORKER_USER}
     labels:
       edu.stanford.slac.indico.service: worker
       edu.stanford.slac.indico.role: "Indico worker"
 
   indico-httpd:
     image: fermented/indico-httpd:stable
+    depends_on:
+      - indico-worker
     ports:
-      - 80:80
-      - 443:443
+      - 444:443
     volumes_from:
       - indico-worker
     links:
       - "indico-worker:indico-worker"
     volumes:
-      - "/home/salnikov/indico/ssl:/etc/ssl/indico"
+      - "/opt/indico/docker/ssl:/etc/ssl/indico:ro"
     labels:
       edu.stanford.slac.indico.service: httpd
       edu.stanford.slac.indico.role: "Web server for Indico"

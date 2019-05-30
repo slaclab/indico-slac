@@ -82,7 +82,14 @@ scripts. There are two of these scripts in the top directory --
 services except for `indico-celery`, latter adds `indico-celery` to the set.
 There should be only one instance of `indico-celery` service in the whole
 cluster, so `docker-compose-celery.yml` should be used on only one host,
-all other hosts shoud use `docker-compose.yml`.
+all other hosts shoud use `docker-compose.yml`. `docker-compose-celery.yml`
+needs services from `docker-compose.yml` so it has to be run as:
+
+    docker-compose -f docker-compose.yml -f docker-compose-celery.yml ...
 
 The files have to be copied and modified to a specific environment as they
-contain paths of the host folders bound to image volumes.
+contain paths of the host folders bound to image volumes. They need one
+environment variable to be set before starting containers, `WORKER_USER` which
+provides UIG:GID pair for the user in worker containers, e.g.:
+
+    export WORKER_USER=$(id -u indico):$(id -g indico)

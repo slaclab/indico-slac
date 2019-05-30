@@ -13,16 +13,13 @@ for specific setup, the instructions for that are included below.
 User account
 ------------
 
-The image is built to run with UID=1000 and GID=1000 internally (and user
-name `indico` which does not really matter). Container needs to access host
-directories to read and write some files as explained in the section below.
-To allow access to host folders there are two options:
-- allow read/write access to those directories for UID=1000
-- run containers with different UID which has read/write access on host system
-
-For latter option one needs to pass `--user UID` option to docker run,
-examples below assume that host system has an `indico` user account and that
-account has correct priviledges for accessing bound directories.
+The image is built to run without USER (uses root UID=0 GID=0) but it will
+not run with default root user, at least for Celery service. Container should
+be started with `--user` option giving _both_ UID and GID, e.g.
+`--user=$(id -u):$(id -g)` if you want to run with current used UID and GID.
+Some of the container volumes need to be bound to a host file system and will
+create files and directories on those volumes. The directories on a host
+filesystem have to allow write access to the container user.
 
 Volumes
 -------
@@ -47,7 +44,7 @@ will look like this:
 
     # -v option has format "<host dir>:<container dir>"
     docker run ... \
-        --user $(id -u indico) \
+        --user $(id -u indico):$(id -g indico) \
         --volume /shared/files/indico-data:/opt/indico/data \
         --volume /local/files/indico-scratch:/opt/indico/scratch \
         fermented/indico-worker
@@ -67,7 +64,7 @@ directory:
 
     mkdir /shared/files/indico-data
     docker run --rm \
-        --user $(id -u indico) \
+        --user $(id -u indico):$(id -g indico) \
         --volume /shared/files/indico-data:/opt/indico/data \
         fermented/indico-worker make-config
 
@@ -86,12 +83,12 @@ Database setup
 If database was never initialized the next step is to run `indico db prepare`
 script. This obviously needs connection to database, so container with
 database server will have to be running already and empty indico database has
-to exist with corresponding accout (defined in `indico.conf`). Assuming that
+to exist with corresponding account (defined in `indico.conf`). Assuming that
 database container name is `indico-db` (this also corresponds to the name of
 database server in config file) the command to initialize database is:
 
     docker run --rm \
-        --user $(id -u indico) \
+        --user $(id -u indico):$(id -g indico) \
         --link indico-db \
         --volume /shared/files/indico-data:/opt/indico/data \
         --volume /local/files/indico-scratch:/opt/indico/scratch \
@@ -109,7 +106,7 @@ redis server have to be running too and they are linked:
 
     docker run --rm --detach \
         --name indico-worker \
-        --user $(id -u indico) \
+        --user $(id -u indico):$(id -g indico) \
         --link indico-db \
         --link indico-redis \
         --volume /shared/files/indico-data:/opt/indico/data \
@@ -128,7 +125,7 @@ explicit `celery` argument instead of `run` (and different container name):
 
     docker run --rm --detach \
         --name indico-celery \
-        --user $(id -u indico) \
+        --user $(id -u indico):$(id -g indico) \
         --link indico-db \
         --link indico-redis \
         --volume /shared/files/indico-data:/opt/indico/data \
