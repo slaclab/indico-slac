@@ -49,6 +49,11 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
 
 COPY ./uwsgi-indico.ini /etc/uwsgi.ini
 
+# make them writable so that when container runs with non-root user
+# it can still create files (when volumes are not explicitly bound)
+RUN mkdir -p ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web && \
+    chmod go+w ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web
+
 #
 #  - scratch is folder for tmp, cache, and log
 #  - web is folder for htdocs and assets
