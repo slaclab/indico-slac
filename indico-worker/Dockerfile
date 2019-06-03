@@ -61,6 +61,9 @@ RUN mkdir -p ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web && \
 #
 VOLUME ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web
 
+# uwsgi port
+EXPOSE 8008
+
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["run"]
