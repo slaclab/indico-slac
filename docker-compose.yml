@@ -20,12 +20,11 @@ services:
 
   indico-db-backup:
     image: fermented/indico-db-backup:${INDICO_TAG:-stable}
-    volumes:
-      - /opt/indico/docker/postgres:/var/lib/postgresql/data
     links:
       - "indico-db:indico-db"
     volumes:
        - /opt/indico/docker/data:/opt/indico/data
+       - /opt/indico/docker/backups:/backups
     labels:
       edu.stanford.slac.indico.service: db-backup
       edu.stanford.slac.indico.role: "Database backup cron job for Indico"
