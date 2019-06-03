@@ -4,7 +4,7 @@
 # Pull latest tag of image from Docker Hub and add a tag to it
 #
 
-tag={$1:-stable}
+tag=${1:-stable}
 
 account=fermented
 images="indico-latex indico-db indico-httpd indico-worker indico-db-backup"
