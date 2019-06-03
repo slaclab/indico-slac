@@ -1,9 +1,9 @@
-version: "2"
+version: "2.1"
 
 services:
 
   indico-celery:
-    image: fermented/indico-worker:stable
+    image: fermented/indico-worker:${INDICO_TAG:-stable}
     command: celery
     depends_on:
       - indico-db

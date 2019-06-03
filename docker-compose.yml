@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
 
@@ -9,7 +9,7 @@ services:
       edu.stanford.slac.indico.role: "Redis service for Indico"
 
   indico-db:
-    image: fermented/indico-db:stable
+    image: fermented/indico-db:${INDICO_TAG:-stable}
 #    ports:
 #      - 5432:5432
     volumes:
@@ -18,8 +18,20 @@ services:
       edu.stanford.slac.indico.service: database
       edu.stanford.slac.indico.role: "Postgres database for Indico"
 
+  indico-db-backup:
+    image: fermented/indico-db-backup:${INDICO_TAG:-stable}
+    volumes:
+      - /opt/indico/docker/postgres:/var/lib/postgresql/data
+    links:
+      - "indico-db:indico-db"
+    volumes:
+       - /opt/indico/docker/data:/opt/indico/data
+    labels:
+      edu.stanford.slac.indico.service: db-backup
+      edu.stanford.slac.indico.role: "Database backup cron job for Indico"
+
   indico-worker:
-    image: fermented/indico-worker:stable
+    image: fermented/indico-worker:${INDICO_TAG:-stable}
     depends_on:
       - indico-redis
       - indico-db
@@ -35,7 +47,7 @@ services:
       edu.stanford.slac.indico.role: "Indico worker"
 
   indico-httpd:
-    image: fermented/indico-httpd:stable
+    image: fermented/indico-httpd:${INDICO_TAG:-stable}
     depends_on:
       - indico-worker
     ports:

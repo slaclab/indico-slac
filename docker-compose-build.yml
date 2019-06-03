@@ -6,6 +6,10 @@ services:
     build: ./indico-db
     image: fermented/indico-db:latest
 
+  indico-db-backup:
+    build: ./indico-db-backup
+    image: fermented/indico-db-backup:latest
+
   indico-latex:
     build: ./indico-latex
     image: fermented/indico-latex:latest
