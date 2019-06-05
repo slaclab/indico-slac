@@ -4,6 +4,7 @@ services:
 
   indico-redis:
     image: redis:alpine
+    restart: always
     labels:
       edu.stanford.slac.indico.service: redis
       edu.stanford.slac.indico.role: "Redis service for Indico"
@@ -14,6 +15,7 @@ services:
 #      - 5432:5432
     volumes:
       - /opt/indico/docker/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: database
       edu.stanford.slac.indico.role: "Postgres database for Indico"
@@ -22,6 +24,7 @@ services:
     image: fermented/indico-db-backup:${INDICO_TAG:-stable}
     links:
       - "indico-db:indico-db"
+    restart: unless-stopped
     volumes:
        - /opt/indico/docker/data:/opt/indico/data
        - /opt/indico/docker/backups:/backups
@@ -41,6 +44,7 @@ services:
        - /opt/indico/docker/data:/opt/indico/data
        - /opt/indico/docker/scratch:/opt/indico/scratch
     user: ${WORKER_USER}
+    restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: worker
       edu.stanford.slac.indico.role: "Indico worker"
@@ -57,6 +61,7 @@ services:
       - "indico-worker:indico-worker"
     volumes:
       - "/opt/indico/docker/ssl:/etc/ssl/indico:ro"
+    restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: httpd
       edu.stanford.slac.indico.role: "Web server for Indico"

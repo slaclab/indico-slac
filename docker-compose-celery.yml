@@ -13,6 +13,7 @@ services:
     volumes_from:
       - indico-worker
     user: ${WORKER_USER}
+    restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: celery
       edu.stanford.slac.indico.role: "Indico celery service"
