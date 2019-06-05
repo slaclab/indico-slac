@@ -54,7 +54,7 @@ services:
     depends_on:
       - indico-worker
     ports:
-      - 444:443
+      - 443:443
     volumes_from:
       - indico-worker
     links:
