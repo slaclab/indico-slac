@@ -17,7 +17,7 @@ EOWARN
         fi
     done
     mkdir -p $INDICO_DIR/data/etc
-    cp /home/indico/indico/etc/* $INDICO_DIR/data/etc/
+    cp /home/${INDICO_USER}/indico/etc/* $INDICO_DIR/data/etc/
     exit
 fi
 
@@ -48,7 +48,7 @@ fi
 if [ "$1" = "run" ]; then
     # populate web/ folder
     mkdir -p ${INDICO_DIR}/web
-    cp -rL --preserve=all /home/${INDICO_USER}/indico/web/htdocs ${INDICO_DIR}/web
+    cp -rL --preserve=all /home/${INDICO_USER}/indico/web/static ${INDICO_DIR}/web
 
     exec /usr/bin/uwsgi --ini /etc/uwsgi.ini
 elif [ "$1" = "celery" ]; then
