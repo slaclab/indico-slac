@@ -5,7 +5,7 @@ FROM fermented/indico-latex:latest
 
 MAINTAINER salnikov@slac.stanford.edu
 
-ENV INDICO_VERSION="2.1.8"
+ENV INDICO_VERSION="2.2.2"
 ENV INDICO_DIR=/opt/indico
 ENV INDICO_USER=indico
 ENV INDICO_GROUP=indico
@@ -13,11 +13,14 @@ ENV INDICO_UID=1000
 ENV INDICO_GID=1000
 
 RUN apt-get update && \
+    apt-get install -y build-essential && \
     apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
     apt-get install -y python-ldap && \
     apt-get install --assume-yes --no-install-recommends python-virtualenv && \
     apt-get install --assume-yes --no-install-recommends procps && \
+    apt-get install --assume-yes --no-install-recommends python-dev && \
+    apt-get install --assume-yes --no-install-recommends libpq-dev && \
     apt-get autoclean && \
     apt-get clean
 
