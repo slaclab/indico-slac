@@ -5,7 +5,7 @@
 # Based on Debian stable
 FROM debian:stretch
 
-MAINTAINER salnikov@slac.stanford.edu
+LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
 RUN apt-get update && \
     apt-get install --assume-yes --no-install-recommends texlive-xetex && \

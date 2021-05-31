@@ -15,6 +15,7 @@ services:
 #      - 5432:5432
     volumes:
       - /opt/indico/docker/postgres:/var/lib/postgresql/data
+    user: ${POSTGRES_USER}
     restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: database
@@ -24,6 +25,7 @@ services:
     image: fermented/indico-db-backup:${INDICO_TAG:-stable}
     links:
       - "indico-db:indico-db"
+    # user: ${POSTGRES_USER}
     restart: unless-stopped
     volumes:
        - /opt/indico/docker/data:/opt/indico/data
@@ -48,6 +50,22 @@ services:
     labels:
       edu.stanford.slac.indico.service: worker
       edu.stanford.slac.indico.role: "Indico worker"
+
+  indico-celery:
+    image: fermented/indico-worker:${INDICO_TAG:-stable}
+    command: celery
+    depends_on:
+      - indico-db
+    links:
+      - "indico-db:indico-db"
+      - "indico-redis:indico-redis"
+    volumes_from:
+      - indico-worker
+    user: ${WORKER_USER}
+    restart: unless-stopped
+    labels:
+      edu.stanford.slac.indico.service: celery
+      edu.stanford.slac.indico.role: "Indico celery service"
 
   indico-httpd:
     image: fermented/indico-httpd:${INDICO_TAG:-stable}

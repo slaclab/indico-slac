@@ -1,7 +1,7 @@
-# Based on standard Postres image
-FROM postgres:10
+# Based on standard Postgres image
+FROM postgres:12
 
-MAINTAINER salnikov@slac.stanford.edu
+LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
 ENV INDICO_DIR=/opt/indico
 ENV BACKUP_DIR=/backups
@@ -11,10 +11,10 @@ ENV BACKUP_KEEP_MONTHS 6
 ENV RESTORE_FILE=indico.dump
 
 # install cron
-# RUN apt-get update && \
-#     apt-get install --assume-yes --no-install-recommends cron && \
-#     apt-get autoclean && \
-#     apt-get clean
+RUN apt-get update && \
+    apt-get install --assume-yes --no-install-recommends cron && \
+    apt-get autoclean && \
+    apt-get clean
 
 VOLUME ${BACKUP_DIR}
 

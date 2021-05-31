@@ -1,7 +1,7 @@
-# Based on standard Postres image
-FROM postgres:10
+# Based on standard Postgres image
+FROM postgres:12
 
-MAINTAINER salnikov@slac.stanford.edu
+LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
 # copy the script to initialize indico database
 COPY indico-initdb.sh /docker-entrypoint-initdb.d/

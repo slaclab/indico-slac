@@ -3,9 +3,9 @@
 # Based on image which includes LaTeX
 FROM fermented/indico-latex:latest
 
-MAINTAINER salnikov@slac.stanford.edu
+LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
-ENV INDICO_VERSION="2.2.2"
+ENV INDICO_VERSION="2.3.5"
 ENV INDICO_DIR=/opt/indico
 ENV INDICO_USER=indico
 ENV INDICO_GROUP=indico

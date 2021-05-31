@@ -1,7 +1,7 @@
 
 FROM nginx:latest
 
-MAINTAINER salnikov@slac.stanford.edu
+LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
 # nginx config file
 COPY ./nginx-indico.conf /etc/nginx/conf.d/indico.conf

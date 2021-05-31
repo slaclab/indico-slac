@@ -15,11 +15,14 @@ command line at database initilaization time. So very first time when one runs
 container the command line will look like this (`indico-db` name is just an
 example, one can use any other name, `stable` tag is also an exmple):
 
-    # create new forder for database store
+    # this is just an example, but it should be consistent with
+    # other parameters
+    DATA=/opt/indico/docker
+    # create new forder for database storage
     mkdir $DATA/postgres
     # start container and create databases (including indico database)
-    docker run --rm --detach \
-        --name indico-db \
+    docker run --rm --detach --name indico-db \
+        --user $(id -u postgres):$(id -g postgres) \
         -e POSTGRES_PASSWORD=secret-pg \
         -e INDICO_PASSWORD=secret-indico \
         -v $DATA/postgres:/var/lib/postgresql/data \
@@ -43,5 +46,5 @@ to container, on subsequent invocations the command will look like:
 
     docker run --rm --detach \
         --name indico-db \
-        -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data \
+        -v $DATA/postgres:/var/lib/postgresql/data \
         fermented/indico-db:stable
