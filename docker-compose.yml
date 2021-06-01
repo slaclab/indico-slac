@@ -4,18 +4,22 @@ services:
 
   indico-redis:
     image: redis:alpine
+    networks: [indico_net]
     restart: always
+    volumes:
+      - redis-data:/data
     labels:
       edu.stanford.slac.indico.service: redis
       edu.stanford.slac.indico.role: "Redis service for Indico"
 
   indico-db:
-    image: fermented/indico-db:${INDICO_TAG:-stable}
+    image: postgres:12
+    networks: [indico_net]
 #    ports:
 #      - 5432:5432
     volumes:
-      - /opt/indico/docker/postgres:/var/lib/postgresql/data
-    user: ${POSTGRES_USER}
+      - ${INDICO_DIR:-/opt/indico-docker}/postgres:/var/lib/postgresql/data
+    user: ${INDICO_USER}
     restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: database
@@ -23,13 +27,14 @@ services:
 
   indico-db-backup:
     image: fermented/indico-db-backup:${INDICO_TAG:-stable}
-    links:
-      - "indico-db:indico-db"
-    # user: ${POSTGRES_USER}
+    depends_on:
+      - indico-db
+    networks: [indico_net]
+    # user: ${INDICO_USER}
     restart: unless-stopped
     volumes:
-       - /opt/indico/docker/data:/opt/indico/data
-       - /opt/indico/docker/backups:/backups
+      - ${INDICO_DIR:-/opt/indico-docker}/data:/opt/indico/data
+      - ${INDICO_DIR:-/opt/indico-docker}/backups:/backups
     labels:
       edu.stanford.slac.indico.service: db-backup
       edu.stanford.slac.indico.role: "Database backup cron job for Indico"
@@ -39,13 +44,11 @@ services:
     depends_on:
       - indico-redis
       - indico-db
-    links:
-      - "indico-db:indico-db"
-      - "indico-redis:indico-redis"
+    networks: [indico_net]
     volumes:
-       - /opt/indico/docker/data:/opt/indico/data
-       - /opt/indico/docker/scratch:/opt/indico/scratch
-    user: ${WORKER_USER}
+      - ${INDICO_DIR:-/opt/indico-docker}/data:/opt/indico/data
+      - ${INDICO_DIR:-/opt/indico-docker}/scratch:/opt/indico/scratch
+    user: ${INDICO_USER}
     restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: worker
@@ -56,12 +59,10 @@ services:
     command: celery
     depends_on:
       - indico-db
-    links:
-      - "indico-db:indico-db"
-      - "indico-redis:indico-redis"
+    networks: [indico_net]
     volumes_from:
       - indico-worker
-    user: ${WORKER_USER}
+    user: ${INDICO_USER}
     restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: celery
@@ -75,11 +76,33 @@ services:
       - 443:443
     volumes_from:
       - indico-worker
-    links:
-      - "indico-worker:indico-worker"
+    networks: [indico_net]
     volumes:
-      - "/opt/indico/docker/ssl:/etc/ssl/indico:ro"
+      - "${INDICO_DIR:-/opt/indico-docker}/ssl:/etc/ssl/indico:ro"
     restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: httpd
       edu.stanford.slac.indico.role: "Web server for Indico"
+
+  indico-collectd:
+    image: fermented/indico-collectd:${INDICO_TAG:-stable}
+    depends_on:
+      - indico-redis
+      - indico-db
+      - indico-worker
+      - indico-httpd
+    networks: [indico_net]
+    privileged: true
+    pid: "host"
+    volumes:
+      - ${INDICO_DIR:-/opt/indico-docker}/data:/opt/indico/data
+      - ${INDICO_DIR:-/opt/indico-docker}/scratch:/opt/indico/scratch
+    environment:
+      INDICO_MON: ${INDICO_MON}
+
+networks:
+  indico_net:
+    name: indico-net
+
+volumes:
+  redis-data:

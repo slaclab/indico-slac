@@ -45,8 +45,8 @@ will look like this:
     # -v option has format "<host dir>:<container dir>"
     docker run ... \
         --user $(id -u indico):$(id -g indico) \
-        --volume /opt/indico/docker/data:/opt/indico/data \
-        --volume /opt/indico/docker/scratch:/opt/indico/scratch \
+        --volume /opt/indico-docker/data:/opt/indico/data \
+        --volume /opt/indico-docker/scratch:/opt/indico/scratch \
         fermented/indico-worker
 
 (`fermented` is the current name of Docker Hub account hosting repositories).
@@ -62,13 +62,13 @@ edit the files. To copy the file to a `data` volume one needs to run
 container with special `make-config` argument and bind `data` volume to a host
 directory:
 
-    mkdir -p /opt/indico/docker/data
+    mkdir -p /opt/indico-docker/data
     docker run --rm \
         --user $(id -u indico):$(id -g indico) \
-        --volume /opt/indico/docker/data:/opt/indico/data \
+        --volume /opt/indico-docker/data:/opt/indico/data \
         fermented/indico-worker make-config
 
-This will create folder `/opt/indico/docker/data/etc` and add `indico.conf`
+This will create folder `/opt/indico-docker/data/etc` and add `indico.conf`
 and `logging.yaml` files. `make-config` will not overwrite existig files if
 any file is already there, error message will be produced. `logging.yaml`
 should be OK to use but `indico.conf` will need updates, comments in the file
@@ -90,8 +90,8 @@ database server in config file) the command to initialize database is:
     docker run --rm \
         --user $(id -u indico):$(id -g indico) \
         --link indico-db \
-        --volume /opt/indico/docker/data:/opt/indico/data \
-        --volume /opt/indico/docker/scratch:/opt/indico/scratch \
+        --volume /opt/indico-docker/data:/opt/indico/data \
+        --volume /opt/indico-docker/scratch:/opt/indico/scratch \
         fermented/indico-worker indico db prepare
 
 Running worker
@@ -109,8 +109,8 @@ redis server have to be running too and they are linked:
         --user $(id -u indico):$(id -g indico) \
         --link indico-db \
         --link indico-redis \
-        --volume /opt/indico/docker/data:/opt/indico/data \
-        --volume /opt/indico/docker/scratch:/opt/indico/scratch \
+        --volume /opt/indico-docker/data:/opt/indico/data \
+        --volume /opt/indico-docker/scratch:/opt/indico/scratch \
         fermented/indico-worker
 
 It is good idea to also specify container restart policy via
@@ -128,8 +128,8 @@ explicit `celery` argument instead of `run` (and different container name):
         --user $(id -u indico):$(id -g indico) \
         --link indico-db \
         --link indico-redis \
-        --volume /opt/indico/docker/data:/opt/indico/data \
-        --volume /opt/indico/docker/scratch:/opt/indico/scratch \
+        --volume /opt/indico-docker/data:/opt/indico/data \
+        --volume /opt/indico-docker/scratch:/opt/indico/scratch \
         fermented/indico-worker celery
 
 There should be just one instance of Celery worker for the whole cluster.

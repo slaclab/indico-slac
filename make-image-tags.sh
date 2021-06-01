@@ -4,7 +4,7 @@
 # Pull latest tag of image from Docker Hub and add a tag to it
 #
 
-images="indico-db indico-httpd indico-latex indico-worker indico-db-backup"
+images="indico-httpd indico-worker indico-db-backup indico-collectd"
 tag="stable"
 account="fermented"
 
@@ -57,11 +57,9 @@ while getopts ht:a: arg; do
 done
 
 shift $(( OPTIND - 1 ))
-if [ -n "$@" ]; then
-    images="$@"
+if [ "$#" -ne 0 ]; then
+    images="$*"
 fi
-
-images="indico-latex indico-db indico-httpd indico-worker indico-db-backup"
 
 for img in $images; do
     docker pull $account/$img:latest

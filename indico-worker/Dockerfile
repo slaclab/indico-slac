@@ -1,7 +1,7 @@
 # https://docs.getindico.io/en/latest/installation/production/debian/apache/
 
-# Based on image which includes LaTeX
-FROM fermented/indico-latex:latest
+# Based on Debian stable
+FROM debian:stable
 
 LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
@@ -11,6 +11,12 @@ ENV INDICO_USER=indico
 ENV INDICO_GROUP=indico
 ENV INDICO_UID=1000
 ENV INDICO_GID=1000
+
+# need latex installed
+RUN apt-get update && \
+    apt-get install --assume-yes --no-install-recommends texlive-xetex && \
+    apt-get autoclean && \
+    apt-get clean
 
 RUN apt-get update && \
     apt-get install -y build-essential && \
@@ -66,6 +72,9 @@ VOLUME ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web
 
 # uwsgi port
 EXPOSE 8008
+
+# uwsgi stats port
+EXPOSE 5050
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

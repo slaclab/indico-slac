@@ -2,17 +2,9 @@ version: "2"
 
 services:
 
-  indico-db:
-    build: ./indico-db
-    image: fermented/indico-db:latest
-
   indico-db-backup:
     build: ./indico-db-backup
     image: fermented/indico-db-backup:latest
-
-  indico-latex:
-    build: ./indico-latex
-    image: fermented/indico-latex:latest
 
   indico-worker:
     build: ./indico-worker
@@ -21,3 +13,7 @@ services:
   indico-httpd:
     build: ./indico-httpd
     image: fermented/indico-httpd:latest
+
+  indico-collectd:
+    build: ./indico-collectd
+    image: fermented/indico-collectd:latest
