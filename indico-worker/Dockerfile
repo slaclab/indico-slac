@@ -14,7 +14,8 @@ ENV INDICO_GID=1000
 
 # need latex installed
 RUN apt-get update && \
-    apt-get install --assume-yes --no-install-recommends texlive-xetex && \
+    apt-get install -y libfontconfig1 ghostscript && \
+    apt-get install -y --no-install-recommends texlive-xetex && \
     apt-get autoclean && \
     apt-get clean
 
@@ -23,10 +24,10 @@ RUN apt-get update && \
     apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
     apt-get install -y python-ldap && \
-    apt-get install --assume-yes --no-install-recommends python-virtualenv && \
-    apt-get install --assume-yes --no-install-recommends procps && \
-    apt-get install --assume-yes --no-install-recommends python-dev && \
-    apt-get install --assume-yes --no-install-recommends libpq-dev && \
+    apt-get install -y --no-install-recommends python-virtualenv && \
+    apt-get install -y --no-install-recommends procps && \
+    apt-get install -y --no-install-recommends python-dev && \
+    apt-get install -y --no-install-recommends libpq-dev && \
     apt-get autoclean && \
     apt-get clean
 
@@ -48,7 +49,7 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
     ${INDICO_USER}
 
 # run setup script to setup things in /home/indico/indico but then move result to
-# /home/indico/indico
+# /opt/indico
 COPY ./indico-wizard.py /home/${INDICO_USER}
 RUN su --login -c "cd /home/${INDICO_USER} && \
     . ./indico-venv/bin/activate && \
@@ -60,15 +61,10 @@ COPY ./uwsgi-indico.ini /etc/uwsgi.ini
 
 # make them writable so that when container runs with non-root user
 # it can still create files (when volumes are not explicitly bound)
-RUN mkdir -p ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web && \
-    chmod go+w ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web
+RUN mkdir -p ${INDICO_DIR} && \
+    chmod go+w ${INDICO_DIR}
 
-#
-#  - scratch is folder for tmp, cache, and log
-#  - web is folder for htdocs and assets
-#  - data is for etc and archive
-#
-VOLUME ${INDICO_DIR}/scratch ${INDICO_DIR}/data ${INDICO_DIR}/web
+VOLUME ${INDICO_DIR}
 
 # uwsgi port
 EXPOSE 8008

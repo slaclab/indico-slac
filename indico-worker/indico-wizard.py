@@ -55,18 +55,11 @@ def main():
 
     # still needs some patching of few parameters
     lines = open(wizard.config_path).read().split('\n')
-    params = ("CACHE_DIR", "")
+    params = ("CACHE_DIR", "TEMP_DIR", "LOG_DIR", "ASSETS_DIR", "STORAGE_BACKENDS")
     with open(wizard.config_path, "w") as cfg:
         for line in lines:
-            if line.startswith(("CACHE_DIR", "TEMP_DIR", "LOG_DIR")):
-                # this go to scratch instead
-                line = line.replace(args.root_path, args.dst_path+"/scratch")
-            elif line.startswith("ASSETS_DIR"):
-                # this go to web/assets instead
-                line = line.replace(args.root_path, args.dst_path+"/web")
-            elif line.startswith("STORAGE_BACKENDS"):
-                # this go to data instead
-                line = line.replace(args.root_path, args.dst_path+"/data")
+            if line.startswith(params):
+                line = line.replace(args.root_path, args.dst_path)
             cfg.write(line + '\n')
 
 if __name__ == "__main__":

@@ -26,30 +26,23 @@ output in `/backups/indico.dump` file (overwriting existing file). With
 file (removing existing database contents first). Container will stop after
 running these one-shot actions.
 
-Example of running container using regular cron job
-
-    docker run --rm --detach \
-        --name indico-db-backup \
-        --network indico-net \
-        -v /opt/indico-docker/data:/opt/indico/data \
-        -v /opt/indico-docker/backups:/backups \
-        fermented/indico-db-backup:stable
+Normally execution of container is orchestrated by `docker-compose` together
+with other Indico containers, see `README.md` at the top-level folder.
 
 To run one-shot backup job just pass `backup` argument:
 
-    docker run --rm \
-        --network indico-net \
-        -v /opt/indico-docker/data:/opt/indico/data \
-        -v /opt/indico-docker/backups:/backups \
-        fermented/indico-db-backup:stable \
-        backup
+    docker-compose run --rm indico-db-backup backup
+
+One can also provide different path for backup file, remember that path is
+inside container:
+
+    docker-compose run --rm indico-db-backup backup /backups/special.dump
 
 To run one-shot restore job just pass `restore` argument, make sure that you
 have right file at `/opt/indico-docker/backups/indico.dump` location:
 
-    docker run --rm \
-        --network indico-net \
-        -v /opt/indico-docker/data:/opt/indico/data \
-        -v /opt/indico-docker/backups:/backups \
-        fermented/indico-db-backup:stable \
-        restore
+    docker-compose run --rm indico-db-backup restore
+
+Or to to restore from a specific file:
+
+    docker-compose run --rm indico-db-backup restore /backups/special.dump

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG_FILES="$INDICO_DIR/data/etc/indico.conf $INDICO_DIR/data/etc/logging.yaml"
+CONFIG_FILES="$INDICO_DIR/etc/indico.conf $INDICO_DIR/etc/logging.yaml"
 
 # generate configuration
 if [ "$1" = "make-config" ]; then
@@ -16,18 +16,18 @@ EOWARN
             exit 2
         fi
     done
-    mkdir -p $INDICO_DIR/data/etc
-    cp /home/${INDICO_USER}/indico/etc/* $INDICO_DIR/data/etc/
+    mkdir -p $INDICO_DIR/etc
+    cp /home/${INDICO_USER}/indico/etc/* $INDICO_DIR/etc/
     exit
 fi
 
 # setup indico
-export INDICO_CONFIG=$INDICO_DIR/data/etc/indico.conf
+export INDICO_CONFIG=$INDICO_DIR/etc/indico.conf
 . /home/${INDICO_USER}/indico-venv/bin/activate
 
 # make folders if they don't exist yet
-mkdir -p ${INDICO_DIR}/data/etc ${INDICO_DIR}/data/archive
-mkdir -p ${INDICO_DIR}/scratch/log ${INDICO_DIR}/scratch/tmp ${INDICO_DIR}/scratch/cache
+mkdir -p ${INDICO_DIR}/etc ${INDICO_DIR}/archive
+mkdir -p ${INDICO_DIR}/log ${INDICO_DIR}/tmp ${INDICO_DIR}/cache
 
 # for regular options we need config files
 if [ "$1" = "run" -o "$1" = "celery" ]; then

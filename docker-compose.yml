@@ -33,7 +33,7 @@ services:
     # user: ${INDICO_USER}
     restart: unless-stopped
     volumes:
-      - ${INDICO_DIR:-/opt/indico-docker}/data:/opt/indico/data
+      - ${INDICO_DIR:-/opt/indico-docker}:/opt/indico
       - ${INDICO_DIR:-/opt/indico-docker}/backups:/backups
     labels:
       edu.stanford.slac.indico.service: db-backup
@@ -46,8 +46,7 @@ services:
       - indico-db
     networks: [indico_net]
     volumes:
-      - ${INDICO_DIR:-/opt/indico-docker}/data:/opt/indico/data
-      - ${INDICO_DIR:-/opt/indico-docker}/scratch:/opt/indico/scratch
+      - ${INDICO_DIR:-/opt/indico-docker}:/opt/indico
     user: ${INDICO_USER}
     restart: unless-stopped
     labels:
@@ -72,11 +71,11 @@ services:
     image: fermented/indico-httpd:${INDICO_TAG:-stable}
     depends_on:
       - indico-worker
+    networks: [indico_net]
     ports:
       - 443:443
     volumes_from:
       - indico-worker
-    networks: [indico_net]
     volumes:
       - "${INDICO_DIR:-/opt/indico-docker}/ssl:/etc/ssl/indico:ro"
     restart: unless-stopped
@@ -95,8 +94,7 @@ services:
     privileged: true
     pid: "host"
     volumes:
-      - ${INDICO_DIR:-/opt/indico-docker}/data:/opt/indico/data
-      - ${INDICO_DIR:-/opt/indico-docker}/scratch:/opt/indico/scratch
+      - ${INDICO_DIR:-/opt/indico-docker}:/opt/indico
     environment:
       INDICO_MON: ${INDICO_MON}
 

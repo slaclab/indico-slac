@@ -2,7 +2,7 @@
 
 # INDICO_DIR and BACKUP_DIR must be set in environment
 
-INDICO_CONFIG="$INDICO_DIR/data/etc/indico.conf"
+INDICO_CONFIG="$INDICO_DIR/etc/indico.conf"
 LOG="$BACKUP_DIR/log"
 
 # get database connection params from Indico config, sorry for messy URL parsing
@@ -17,18 +17,23 @@ make_backup() {
     pg_dump --format=c --file="$dst" $PGDATABASE
 }
 
-parse_config
+parse_config || exit 1
 
 if [ "$1" = "backup" ]; then
 
     echo $(date +'%Y-%m-%d %H:%M:%S'): $* >> $LOG
-    restore_file=${2:-/backups/indico.dump}
+    restore_file=${2:-${BACKUP_DIR}/indico.dump}
     make_backup $restore_file.tmp  && mv $restore_file.tmp $restore_file >> $LOG 2>&1
 
 elif [ "$1" = "restore" ]; then
 
     echo $(date +'%Y-%m-%d %H:%M:%S'): $* >> $LOG
-    restore_file=${2:-/backups/indico.dump}
+    restore_file=${2:-${BACKUP_DIR}/indico.dump}
+    if [ ! -f "$restore_file" ]; then
+        echo "Backup file $restore_file does not exist" >> $LOG
+        echo "Backup file $restore_file does not exist" 1>&2
+        exit 1
+    fi
     dropdb --if-exists $PGDATABASE && \
         createdb --owner=$PGUSER $PGDATABASE && \
         pg_restore --dbname=$PGDATABASE $restore_file >> $LOG 2>&1

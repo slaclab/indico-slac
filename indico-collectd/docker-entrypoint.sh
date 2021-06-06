@@ -17,7 +17,7 @@ if [ "$1" = "collectd" ]; then
     else
 
         IFS=: read host port <<< $INDICO_MON
-        parse_config "$INDICO_DIR/data/etc/indico.conf"
+        parse_config "$INDICO_DIR/etc/indico.conf"
 
         sed \
             -e "s:INDICO_DIR:$INDICO_DIR:g" \
