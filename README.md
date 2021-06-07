@@ -15,30 +15,30 @@ The whole thing is split into multiple services and containers:
 - Image to manage backups of Indico database in `indico-db-backup` folder
 - Image to collect monitoring stats in `indico-collectd` folder
 
-Images can be built locally, but they are also hosted on Docker Hub in
+Images are built locally and pushed to DockerHub
 [fermented](https://hub.docker.com/u/fermented/) account, instructions
 and configuration files in this repository use images from DockerHub.
 
 
 ## Building images
 
-Images are normally built by Docker Hub automated builds with `latest` tag
-after updates to Github repository. Stable images are tagged by `stable` tag,
-these images are normally used for production running. To tag all `latest`
-images in DockerHub with `stable` tag:
-
-    ./make-image-tags.sh
-
-To tag a specific image with some other tag:
-
-    ./make-image-tags.sh -t 2.3.0 indico-worker
-
-Images can also be built locally, simplest is to use `docker-compose` script
-`docker-compose-build.yml` which builds all local images using `latest` tag:
+Images are built with `latest` tag using the command:
 
     docker-compose -f docker-compose-build.yml build
 
-(local `latest` tag will be overwritten if you pull image from DockerHub).
+and pushed to DockerHub with command:
+
+    docker-compose -f docker-compose-build.yml push
+
+Stable images should be tagged by `stable` tag, these images are normally used
+for production running. To tag all `latest` images in DockerHub with `stable`
+tag:
+
+    ./make-image-tags.sh
+
+To tag a specific image `latest` tag with some other tag:
+
+    ./make-image-tags.sh -t 2.3.0 indico-worker
 
 
 # Initial configuration
@@ -145,8 +145,8 @@ execution of the whole set of containers. This needs small number of
 environment variables to be defined:
 - `INDICO_TAG` - optional tag for docker images, default is to use `stable`
 - `INDICO_DIR` - optional top-level directory name on host system, defaults to
-  `opt/indico-docker`
-- `INDICO_USER` which defines UID and GID for container execution
+  `/opt/indico-docker`
+- `INDICO_USER` - UID and GID for container execution
 - `INDICO_MON` - host and port for publishing monitoring information
 
 This is the typical setup:
@@ -159,6 +159,11 @@ and with this one can start whole thing by:
 
     docker-compose up -d
 
+If only a subset of services is need, e.g. only running worker, database,
+redis, and web server:
+
+    docker-compose up -d indico-worker indico-httpd
+
 To list running containers:
 
     docker-compose ps
@@ -170,3 +175,34 @@ And to check logs from specific service:
 If any image is updated then to restart containers with new image:
 
     docker-compose up -d
+
+
+## Indico version upgrade
+
+When new version of Indico is released:
+
+- at minimum update version number in `indico-worker/Dockerfile`, there may be
+  other changes needed, check installation instructions
+- build the whole shebang and push to DockerHub:
+```
+    docker-compose -f docker-compose-build.yml build
+    docker-compose -f docker-compose-build.yml push
+```
+- tag `indico-worker` with a new version tag and `current` tag:
+```
+    ./make-image-tags.sh -t X.Y.Z indico-worker
+    ./make-image-tags.sh -t current indico-worker
+```
+- restart whole thing using new `current` tag:
+```
+    export INDICO_USER=$(id -u indico):$(id -g daemon)
+    export INDICO_MON="134.79.129.138:25826"  # or something else
+    docker-compose up -d
+```
+
+
+## Database backup and restore
+
+`indico-db-backup` has couple of special commands to backup otr restore
+database contents. Check [indico-db-backup README](indico-db-backup/README.md)
+for details.
