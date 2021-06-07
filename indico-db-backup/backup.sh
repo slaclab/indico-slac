@@ -7,7 +7,7 @@ LOG="$BACKUP_DIR/log"
 
 # get database connection params from Indico config, sorry for messy URL parsing
 parse_config() {
-    vars=$(sed -n "s%SQLALCHEMY_DATABASE_URI *= ['\"]*postgres://\(.*\):\(.*\)@\(.*\)\(:\([0-9]+\)\)*/\(.*\)['\"]%export PGUSER=\1 PGPASSWORD=\2 PGHOST=\3 PGPORT=\5 PGDATABASE=\6%p" <$INDICO_CONFIG)
+    vars=$(sed -n "s%SQLALCHEMY_DATABASE_URI *= ['\"]*postgres.*://\(.*\):\(.*\)@\(.*\)\(:\([0-9]+\)\)*/\(.*\)['\"]%export PGUSER=\1 PGPASSWORD=\2 PGHOST=\3 PGPORT=\5 PGDATABASE=\6%p" <$INDICO_CONFIG)
     eval $vars
 }
 
