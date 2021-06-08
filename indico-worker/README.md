@@ -10,6 +10,10 @@ customized version of `indico setup wizard` script which generates default
 configuration files. Obviously these configuration files need to be updated
 for specific setup, the instructions for that are included below.
 
+Differences in configuration compared to Indico instructions:
+- we handle X-SendFile in uwsgi rather than apache, uwsgi config file has
+  few additional options for that
+
 User account
 ------------
 

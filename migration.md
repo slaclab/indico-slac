@@ -168,11 +168,10 @@ Few specific configuration parameters:
 - `SQLALCHEMY_DATABASE_URI` needs a host name and a password, e.g.
   `'postgres://indico:password@indico-db/indico'`
 - `SMTP_SERVER` has to point to `smtpout.slac.stanford.edu`, port 25.
-- `STATIC_FILE_METHOD` has to be commented out, default Apache image does not
-  include `mod_xsendfile`.
 - `XELATEX_PATH` has to be commented out, it is in standard location.
 - for testing onle `BASE_URL` needs to point to actual host name
   (`https://indico01.slac.stanford.edu`)
+
 
 Step 6. Make database schema
 ----------------------------
