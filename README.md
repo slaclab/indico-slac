@@ -183,7 +183,8 @@ When new version of Indico is released:
 
 - at minimum update version number in `indico-worker/Dockerfile`, there may be
   other changes needed, check installation instructions
-- build the whole shebang and push to DockerHub:
+- build the whole shebang and push to DockerHub with the `latest` tag for each
+  image:
 ```
     docker-compose -f docker-compose-build.yml build
     docker-compose -f docker-compose-build.yml push
@@ -192,6 +193,11 @@ When new version of Indico is released:
 ```
     ./make-image-tags.sh -t X.Y.Z indico-worker
     ./make-image-tags.sh -t current indico-worker
+```
+- if other images changed it is easier to tag all of them with the `current`
+  tag:
+```
+    ./make-image-tags.sh
 ```
 - restart whole thing using new `current` tag:
 ```

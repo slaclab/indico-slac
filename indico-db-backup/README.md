@@ -46,3 +46,8 @@ have right file at `/opt/indico-docker/backups/indico.dump` location:
 Or to to restore from a specific file:
 
     docker-compose run --rm indico-db-backup restore /backups/special.dump
+
+Restoring the database needs to remove it first, and to the database remove we
+need to stop all client containers:
+
+    docker-compose stop indico-celery indico-worker indico-collectd
