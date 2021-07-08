@@ -26,7 +26,7 @@ services:
       edu.stanford.slac.indico.role: "Postgres database for Indico"
 
   indico-db-backup:
-    image: fermented/indico-db-backup:${INDICO_TAG:-stable}
+    image: indico4slac/indico-db-backup:${INDICO_TAG:-stable}
     depends_on:
       - indico-db
     networks: [indico_net]
@@ -40,7 +40,7 @@ services:
       edu.stanford.slac.indico.role: "Database backup cron job for Indico"
 
   indico-worker:
-    image: fermented/indico-worker:${INDICO_TAG:-stable}
+    image: indico4slac/indico-worker:${INDICO_TAG:-stable}
     depends_on:
       - indico-redis
       - indico-db
@@ -54,7 +54,7 @@ services:
       edu.stanford.slac.indico.role: "Indico worker"
 
   indico-celery:
-    image: fermented/indico-worker:${INDICO_TAG:-stable}
+    image: indico4slac/indico-worker:${INDICO_TAG:-stable}
     command: celery
     depends_on:
       - indico-db
@@ -68,7 +68,7 @@ services:
       edu.stanford.slac.indico.role: "Indico celery service"
 
   indico-httpd:
-    image: fermented/indico-httpd:${INDICO_TAG:-stable}
+    image: indico4slac/indico-httpd:${INDICO_TAG:-stable}
     depends_on:
       - indico-worker
     networks: [indico_net]
@@ -84,7 +84,7 @@ services:
       edu.stanford.slac.indico.role: "Web server for Indico"
 
   indico-collectd:
-    image: fermented/indico-collectd:${INDICO_TAG:-stable}
+    image: indico4slac/indico-collectd:${INDICO_TAG:-stable}
     depends_on:
       - indico-redis
       - indico-db

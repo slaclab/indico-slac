@@ -16,8 +16,9 @@ The whole thing is split into multiple services and containers:
 - Image to collect monitoring stats in `indico-collectd` folder
 
 Images are built locally and pushed to DockerHub
-[fermented](https://hub.docker.com/u/fermented/) account, instructions
-and configuration files in this repository use images from DockerHub.
+[indico4slac](https://hub.docker.com/orgs/indico4slac) organization,
+instructions and configuration files in this repository use images from
+DockerHub.
 
 
 ## Building images

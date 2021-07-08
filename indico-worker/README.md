@@ -38,9 +38,10 @@ storage on host. The volume option for `docker run` will look like this:
     docker run ... \
         --user $(id -u indico):$(id -g indico) \
         --volume /opt/indico-docker:/opt/indico \
-        fermented/indico-worker
+        indico4slac/indico-worker
 
-(`fermented` is the current name of Docker Hub account hosting repositories).
+(`indico4slac` is the current name of Docker Hub organization hosting
+repositories).
 
 Setup
 -----

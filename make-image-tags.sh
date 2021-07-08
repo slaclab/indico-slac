@@ -6,7 +6,7 @@
 
 images="indico-httpd indico-worker indico-db-backup indico-collectd"
 tag="stable"
-account="fermented"
+account="indico4slac"
 
 usage() {
 
