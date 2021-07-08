@@ -190,17 +190,17 @@ When new version of Indico is released:
     docker-compose -f docker-compose-build.yml build
     docker-compose -f docker-compose-build.yml push
 ```
-- tag `indico-worker` with a new version tag and `current` tag:
+- tag `indico-worker` with a new version tag and `stable` tag:
 ```
     ./make-image-tags.sh -t X.Y.Z indico-worker
-    ./make-image-tags.sh -t current indico-worker
+    ./make-image-tags.sh -t stable indico-worker
 ```
-- if other images changed it is easier to tag all of them with the `current`
+- if other images changed it is easier to tag all of them with the `stable`
   tag:
 ```
     ./make-image-tags.sh
 ```
-- restart whole thing using new `current` tag:
+- restart whole thing using new `stable` tag:
 ```
     export INDICO_USER=$(id -u indico):$(id -g daemon)
     export INDICO_MON="134.79.129.138:25826"  # or something else
