@@ -6,6 +6,8 @@ FROM debian:stable
 LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
 ENV INDICO_VERSION="2.3.5"
+# empty string for latest indico-plugins compatible with INDICO_VERSION
+ENV INDICO_PLUGINS_VERSION=""
 ENV INDICO_DIR=/opt/indico
 ENV INDICO_USER=indico
 ENV INDICO_GROUP=indico
@@ -44,7 +46,8 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
     python -m virtualenv --system-site-packages indico-venv && \
     . ./indico-venv/bin/activate && \
     pip install --no-cache-dir -U pip setuptools && \
-    pip install --no-cache-dir indico==${INDICO_VERSION} indico-plugins && \
+    pip install --no-cache-dir indico==${INDICO_VERSION} \
+            indico-plugins${INDICO_PLUGINS_VERSION:+==$INDICO_PLUGINS_VERSION} && \
     rm -rf .cache" \
     ${INDICO_USER}
 
