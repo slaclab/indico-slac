@@ -25,12 +25,11 @@ RUN apt-get update && \
 
 RUN apt-get update && \
     apt-get install -y build-essential && \
-    # apt-get install -y uwsgi uwsgi-plugin-python && \
+    apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
-    apt-get install -y python-ldap && \
     apt-get install -y --no-install-recommends procps && \
-    apt-get install -y --no-install-recommends python-dev && \
     apt-get install -y --no-install-recommends libpq-dev && \
+    apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev libssl-dev  && \
     apt-get autoclean && \
     apt-get clean
 
@@ -47,6 +46,7 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
     python -m venv --upgrade-deps --prompt indico indico-venv && \
     . ./indico-venv/bin/activate && \
     pip install --no-cache-dir wheel uwsgi && \
+    pip install --no-cache-dir python-ldap && \
     pip install --no-cache-dir indico==${INDICO_VERSION} \
             indico-plugins${INDICO_PLUGINS_VERSION:+==$INDICO_PLUGINS_VERSION} && \
     rm -rf .cache" \
