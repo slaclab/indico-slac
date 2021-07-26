@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 if [ "$1" = "backup" ]; then
-    /backup.sh backup "$BACKUP_DIR/$RESTORE_FILE"
+    /backup.sh backup "${2:-$BACKUP_DIR/$RESTORE_FILE}"
 elif [ "$1" = "restore" ]; then
-    /backup.sh restore "$BACKUP_DIR/$RESTORE_FILE"
+    /backup.sh restore "${2:-$BACKUP_DIR/$RESTORE_FILE}"
 elif [ "$1" = "cron" ]; then
     # make few cron entries and run cron daemon
     #     m h dom mon dow user  command

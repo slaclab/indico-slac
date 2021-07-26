@@ -13,7 +13,7 @@ services:
       edu.stanford.slac.indico.role: "Redis service for Indico"
 
   indico-db:
-    image: postgres:12
+    image: postgres:13
     networks: [indico_net]
 #    ports:
 #      - 5432:5432

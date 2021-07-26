@@ -1,5 +1,5 @@
 # Based on standard Postgres image
-FROM postgres:12
+FROM postgres:13
 
 LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 

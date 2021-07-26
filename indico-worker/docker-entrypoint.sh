@@ -50,7 +50,7 @@ if [ "$1" = "run" ]; then
     mkdir -p ${INDICO_DIR}/web
     cp -rL --preserve=all /home/${INDICO_USER}/indico/web/static ${INDICO_DIR}/web
 
-    exec /usr/bin/uwsgi --ini /etc/uwsgi.ini
+    exec /home/${INDICO_USER}/indico-venv/bin/uwsgi --ini /etc/uwsgi.ini
 elif [ "$1" = "celery" ]; then
     exec indico celery worker -B
 else

@@ -74,7 +74,7 @@ number and some protection depends on groups:
 
 On the very fist execution of `indico-db` container when database data folder
 is empty it has to be passed few environment variables which define passwords
-for a priviledged database account, which is usually `postgres` (can be
+for a privileged database account, which is usually `postgres` (can be
 changed if needed). The password is only used to connect to that account from
 other containers, when executing `psql` from inside container password is not
 used.
@@ -113,7 +113,8 @@ steps needed to configure and initialize Indico worker container. These steps
 include:
 - Copying pre-defined configuration files to a volume on host
 - Editing `indico.conf` file to configure it for local environment
-- Running container with `indico db prepare` command to create database schema
+- Running container with `indico db prepare` command to create database schema,
+  or restoring a backup of PostgreSQL dump if migrating from previous version
 
 First step is to generate default configuration file:
 
@@ -123,10 +124,20 @@ This will create `indico.conf` and `logging.yaml` in `$INDICO_DIR/etc/` folder
 (and container will stop immediately). `indico.conf` has to be updated with
 all necessary configuration changes, and in particular with a new database
 password in `SQLALCHEMY_DATABASE_URI` parameter. `SMTP_SERVER` needs to point
-to host node IP instead of `localhost`. After fixing configuration thge
+to host node IP instead of `localhost`. After fixing configuration the
 database schema needs to be created with this command:
 
     docker-compose run --rm indico-worker indico db prepare
+
+or if case of migration from previous releases one can restore databsae backup:
+
+    cp .../old-backup.dump  $INDICO_DIR/backups/indico.dump
+    docker-compose run --rm indico-db-backup restore
+
+followed by ususa `indico db upgrade`:
+
+    docker-compose run --rm indico-worker indico db upgrade
+    docker-compose run --rm indico-worker indico db --all-plugins upgrade
 
 
 ## SSL setup for web service
@@ -141,7 +152,7 @@ copied in a usual way. For testing one can create self-signed certificate:
 
 # Regular deployment
 
-After initial setup is complet `docker-compose` is used to orchestrate
+After initial setup is complete `docker-compose` is used to orchestrate
 execution of the whole set of containers. This needs small number of
 environment variables to be defined:
 - `INDICO_TAG` - optional tag for docker images, default is to use `stable`

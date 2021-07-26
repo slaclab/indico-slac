@@ -1,11 +1,13 @@
 # https://docs.getindico.io/en/latest/installation/production/debian/apache/
 
-# Based on Debian stable
-FROM debian:stable
+# indico3 needs Python 3.9, instead of building is from scratch based
+# on installation istructions we use python-3.9 image and add necessary
+# stuff to it
+FROM python:3.9-buster
 
 LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
-ENV INDICO_VERSION="2.3.5"
+ENV INDICO_VERSION="3.0"
 # empty string for latest indico-plugins compatible with INDICO_VERSION
 ENV INDICO_PLUGINS_VERSION=""
 ENV INDICO_DIR=/opt/indico
@@ -23,10 +25,9 @@ RUN apt-get update && \
 
 RUN apt-get update && \
     apt-get install -y build-essential && \
-    apt-get install -y uwsgi uwsgi-plugin-python && \
+    # apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
     apt-get install -y python-ldap && \
-    apt-get install -y --no-install-recommends python-virtualenv && \
     apt-get install -y --no-install-recommends procps && \
     apt-get install -y --no-install-recommends python-dev && \
     apt-get install -y --no-install-recommends libpq-dev && \
@@ -43,9 +44,9 @@ RUN groupadd --gid ${INDICO_GID} ${INDICO_GROUP} && \
 
 # install indico from PyPI (and clean pip cache)
 RUN su --login -c "cd /home/${INDICO_USER} && \
-    python -m virtualenv --system-site-packages indico-venv && \
+    python -m venv --upgrade-deps --prompt indico indico-venv && \
     . ./indico-venv/bin/activate && \
-    pip install --no-cache-dir -U pip setuptools && \
+    pip install --no-cache-dir wheel uwsgi && \
     pip install --no-cache-dir indico==${INDICO_VERSION} \
             indico-plugins${INDICO_PLUGINS_VERSION:+==$INDICO_PLUGINS_VERSION} && \
     rm -rf .cache" \
