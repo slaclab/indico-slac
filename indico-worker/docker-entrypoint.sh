@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+if [ $(id -u) -eq 0 ]; then
+    cat >&2 <<EOWARN
+***************************************************************************
+FATAL: Running as root is not supported, please run under UID which was
+       used to create indico data folders. Check README.md for instructions
+       for how to set INDICO_USER envvar for use with docker-compose.
+***************************************************************************
+EOWARN
+    exit 2
+fi
+
 CONFIG_FILES="$INDICO_DIR/etc/indico.conf $INDICO_DIR/etc/logging.yaml"
 
 # generate configuration
