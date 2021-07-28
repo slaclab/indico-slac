@@ -79,11 +79,11 @@ changed if needed). The password is only used to connect to that account from
 other containers, when executing `psql` from inside container password is not
 used.
 
-To start container for one-time initialization (assuming Posgres v12), tag can
-be `stable` but here we override it with `latest`:
+To start Postgres container for one-time initialization (if you want to run
+container in foreground and omit `-d` option don't forget to add `--rm`
+option or cleanup container after it stops):
 
     export INDICO_USER=$(id -u indico):$(id -g daemon)
-    export INDICO_TAG=latest
     docker-compose run -d -e POSTGRES_PASSWORD=****** indico-db
 
 One it is started you can connect to the server from container itself and
@@ -118,6 +118,7 @@ include:
 
 First step is to generate default configuration file:
 
+    export INDICO_TAG=stable  # or `latest` or any other tag
     docker-compose run --no-deps --rm indico-worker make-config
 
 This will create `indico.conf` and `logging.yaml` in `$INDICO_DIR/etc/` folder
@@ -129,12 +130,12 @@ database schema needs to be created with this command:
 
     docker-compose run --rm indico-worker indico db prepare
 
-or if case of migration from previous releases one can restore databsae backup:
+or in case of migration from previous releases one can restore database backup:
 
     cp .../old-backup.dump  $INDICO_DIR/backups/indico.dump
     docker-compose run --rm indico-db-backup restore
 
-followed by ususa `indico db upgrade`:
+followed by usual `indico db upgrade`:
 
     docker-compose run --rm indico-worker indico db upgrade
     docker-compose run --rm indico-worker indico db --all-plugins upgrade
@@ -153,7 +154,7 @@ copied in a usual way. For testing one can create self-signed certificate:
 # Regular deployment
 
 After initial setup is complete `docker-compose` is used to orchestrate
-execution of the whole set of containers. This needs small number of
+execution of the whole set of containers. This needs a small number of
 environment variables to be defined:
 - `INDICO_TAG` - optional tag for docker images, default is to use `stable`
 - `INDICO_DIR` - optional top-level directory name on host system, defaults to
@@ -165,7 +166,7 @@ This is the typical setup:
 
     export INDICO_USER=$(id -u indico):$(id -g daemon)
     export INDICO_MON="134.79.129.138:25826"  # or something else
-    export INDICO_TAG=latest  # or `stable`
+    export INDICO_TAG=stable  # or `latest`
 
 and with this one can start whole thing by:
 
