@@ -19,7 +19,7 @@ services:
 #      - 5432:5432
     volumes:
       - ${INDICO_DIR:-/opt/indico-docker}/postgres:/var/lib/postgresql/data
-    user: ${INDICO_USER}
+    # user: ${INDICO_USER}
     restart: unless-stopped
     labels:
       edu.stanford.slac.indico.service: database
