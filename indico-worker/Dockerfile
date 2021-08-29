@@ -13,8 +13,8 @@ ENV INDICO_PLUGINS_VERSION=""
 ENV INDICO_DIR=/opt/indico
 ENV INDICO_USER=indico
 ENV INDICO_GROUP=indico
-ENV INDICO_UID=1000
-ENV INDICO_GID=1000
+ENV INDICO_UID=987
+ENV INDICO_GID=987
 
 # need latex installed
 RUN apt-get update && \
@@ -25,6 +25,7 @@ RUN apt-get update && \
 
 RUN apt-get update && \
     apt-get install -y build-essential && \
+    apt-get install -y gosu && \
     apt-get install -y uwsgi uwsgi-plugin-python && \
     apt-get install -y libjpeg62-turbo-dev && \
     apt-get install -y --no-install-recommends procps && \
@@ -33,13 +34,16 @@ RUN apt-get update && \
     apt-get autoclean && \
     apt-get clean
 
-# indico needs separate user
+# - Make a new user, this will be used if container runs as root.
+# - Make ${INDICO_DIR} writable so that when container runs with non-root user
+#   it can still create files (when volumes are not explicitly bound)
 RUN groupadd --gid ${INDICO_GID} ${INDICO_GROUP} && \
     useradd -m --home-dir /home/${INDICO_USER} \
             --uid ${INDICO_UID} --gid ${INDICO_GID} \
             ${INDICO_USER} && \
     mkdir -p ${INDICO_DIR} && \
-    chown ${INDICO_USER} ${INDICO_DIR}
+    chown ${INDICO_USER} ${INDICO_DIR} && \
+    chmod go+w ${INDICO_DIR}
 
 # install indico from PyPI (and clean pip cache)
 RUN su --login -c "cd /home/${INDICO_USER} && \
@@ -62,11 +66,6 @@ RUN su --login -c "cd /home/${INDICO_USER} && \
     ${INDICO_USER}
 
 COPY ./uwsgi-indico.ini /etc/uwsgi.ini
-
-# make them writable so that when container runs with non-root user
-# it can still create files (when volumes are not explicitly bound)
-RUN mkdir -p ${INDICO_DIR} && \
-    chmod go+w ${INDICO_DIR}
 
 VOLUME ${INDICO_DIR}
 

@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 
-if [ $(id -u) -eq 0 ]; then
-    cat >&2 <<EOWARN
-***************************************************************************
-FATAL: Running as root is not supported, please run under UID which was
-       used to create indico data folders. Check README.md for instructions
-       for how to set INDICO_USER envvar for use with docker-compose.
-***************************************************************************
-EOWARN
-    exit 2
-fi
+# setup indico
+export INDICO_CONFIG=$INDICO_DIR/etc/indico.conf
+. /home/${INDICO_USER}/indico-venv/bin/activate
 
 CONFIG_FILES="$INDICO_DIR/etc/indico.conf $INDICO_DIR/etc/logging.yaml"
 
 # generate configuration
-if [ "$1" = "make-config" ]; then
+make_configs() {
     for f in $CONFIG_FILES; do
         if [ -f "$f" ]; then
             cat >&2 <<EOWARN
@@ -29,41 +22,58 @@ EOWARN
     done
     mkdir -p $INDICO_DIR/etc
     cp /home/${INDICO_USER}/indico/etc/* $INDICO_DIR/etc/
-    exit
-fi
-
-# setup indico
-export INDICO_CONFIG=$INDICO_DIR/etc/indico.conf
-. /home/${INDICO_USER}/indico-venv/bin/activate
+}
 
 # make folders if they don't exist yet
-mkdir -p ${INDICO_DIR}/etc ${INDICO_DIR}/archive
-mkdir -p ${INDICO_DIR}/log ${INDICO_DIR}/tmp ${INDICO_DIR}/cache
+make_folders() {
+    folders="archive cache etc log tmp"
+    for folder in $folders; do
+        mkdir -p ${INDICO_DIR}/${folder}
+    done
+    # if running as root make sure that all files belong to indico user
+    if [ "$(id -u)" = "0" ]; then
+        for folder in $folders; do
+            chown -R ${INDICO_UID}:${INDICO_GID} ${INDICO_DIR}/${folder}
+        done
+    fi
+}
 
-# for regular options we need config files
-if [ "$1" = "run" -o "$1" = "celery" ]; then
+check_configs() {
+    # for regular options we need config files
     for f in $CONFIG_FILES; do
         if [ ! -f "$f" ]; then
             cat >&2 <<EOWARN
 ***************************************************************************
 WARNING: Configuration files are missing. Please run container with
-         "make-config" argument and update configuration files.
-         $CONFIG_FILES
+        "make-config" argument and update configuration files.
+        $CONFIG_FILES
 ***************************************************************************
 EOWARN
             exit 2
         fi
     done
+}
+
+if [ "$(id -u)" = "0" ]; then
+    __gosu="gosu ${INDICO_UID}:${INDICO_GID}"
 fi
 
-if [ "$1" = "run" ]; then
-    # populate web/ folder
-    mkdir -p ${INDICO_DIR}/web
-    cp -rL --preserve=all /home/${INDICO_USER}/indico/web/static ${INDICO_DIR}/web
-
-    exec /home/${INDICO_USER}/indico-venv/bin/uwsgi --ini /etc/uwsgi.ini
+if [ "$1" = "make-config" ]; then
+    make_configs
+elif [ "$1" = "run" ]; then
+    make_folders
+    check_configs
+    exec ${__gosu} /home/${INDICO_USER}/indico-venv/bin/uwsgi --ini /etc/uwsgi.ini
 elif [ "$1" = "celery" ]; then
-    exec indico celery worker -B
+    check_configs
+    if [ "$(id -u)" != "0" ]; then
+        if ! getent group $(id -g) 2>/dev/null; then
+            # celery fails if GID does not correspond to real group name,
+            # workaround is to specify C_FORCE_ROOT.
+            export C_FORCE_ROOT=Y
+        fi
+    fi
+    exec ${__gosu} indico celery worker -B
 else
     exec "$@"
 fi

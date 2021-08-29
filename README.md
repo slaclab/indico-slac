@@ -41,6 +41,28 @@ To tag a specific image `latest` tag with some other tag:
 
     ./make-image-tags.sh -t 2.3.0 indico-worker
 
+# User account
+
+By default both indico containers (`indico-worker` and `indico-celery`) run
+under the special user account defined in the image with UID=987 and GID=987.
+All files and folders created by the containers are owned by this user,
+including files on volumes that are mapped to a host file system. In practice
+this means that those file should only be readable by `root` as group `987` is
+not likely to exist on the host.
+
+If it is desirable to have those files owned by an actual user account on the
+host system (e.g. dedicated `indico` account) then one has to define a special
+environment variable before starting containers. Variable name is
+`INDICO_USER` and it has to contain UID and GID numbers separated by colon,
+e.g.:
+
+    export INDICO_USER=$(id -u indico):$(id -g indico)
+
+Note that when `indico-worker` container starts without `INDICO_USER` it runs
+initially as `root`. As `root` it changes ownership of the indico files on
+exported volumes to UID=987 and GID=987 and then starts indico process with
+the same UID and GID.
+
 
 # Initial configuration
 
@@ -60,14 +82,18 @@ data used by all services. We use `/opt/indico-docker` as the root for all
 folders (but this can be changed) and use a local `indico` account for
 ownership.
 
-Here is the list commands to make all sub-folders and assign correct ownership
-(assuming local account `indico` has been created already, group `daemon` (1)
-is used for running many containers because Apache container uses that group
-number and some protection depends on groups:
+Here is the list commands to make all sub-folders:
 
     export INDICO_DIR=/opt/indico-docker
-    sudo mkdir -p $INDICO_DIR $INDICO_DIR/backups $INDICO_DIR/ssl $INDICO_DIR/postgres
-    sudo chown -R indico.daemon $INDICO_DIR
+    sudo mkdir -p $INDICO_DIR $INDICO_DIR/backups $INDICO_DIR/ssl $INDICO_DIR/postgres $INDICO_DIR/log
+
+If you plan to run indico containers under a non-default user ID on local
+host, e.g. `indico` (by setting `INDICO_USER`, see below) then change
+ownership of the created folders:
+
+    sudo chown -R $(id -u indico).$(id -g indico) $INDICO_DIR
+
+(`postgres` folder ownership will be changed later by postgres container).
 
 
 ## Database setup
@@ -83,7 +109,6 @@ To start Postgres container for one-time initialization (if you want to run
 container in foreground and omit `-d` option don't forget to add `--rm`
 option or cleanup container after it stops):
 
-    export INDICO_USER=$(id -u indico):$(id -g daemon)
     docker-compose run -d -e POSTGRES_PASSWORD=****** indico-db
 
 One it is started you can connect to the server from container itself and
@@ -118,6 +143,7 @@ include:
 
 First step is to generate default configuration file:
 
+    export INDICO_USER=$(id -u indico):$(id -g indico)  # optional, see above
     export INDICO_TAG=stable  # or `latest` or any other tag
     docker-compose run --no-deps --rm indico-worker make-config
 
@@ -159,12 +185,12 @@ environment variables to be defined:
 - `INDICO_TAG` - optional tag for docker images, default is to use `stable`
 - `INDICO_DIR` - optional top-level directory name on host system, defaults to
   `/opt/indico-docker`
-- `INDICO_USER` - UID and GID for container execution
+- `INDICO_USER` - optional UID and GID for container execution
 - `INDICO_MON` - host and port for publishing monitoring information
 
 This is the typical setup:
 
-    export INDICO_USER=$(id -u indico):$(id -g daemon)
+    # export INDICO_USER=$(id -u indico):$(id -g indico)  # optional, see above
     export INDICO_MON="134.79.129.138:25826"  # or something else
     export INDICO_TAG=stable  # or `latest`
 
@@ -214,7 +240,7 @@ When new version of Indico is released:
 ```
 - restart whole thing using new `stable` tag:
 ```
-    export INDICO_USER=$(id -u indico):$(id -g daemon)
+    # export INDICO_USER=$(id -u indico):$(id -g daemon)  # optional, see above
     export INDICO_MON="134.79.129.138:25826"  # or something else
     docker-compose up -d
 ```
