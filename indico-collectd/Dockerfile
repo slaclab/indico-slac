@@ -7,7 +7,8 @@ ENV INDICO_MON=
 # install collectd
 RUN apt-get update && \
     apt-get install -y --no-install-recommends collectd \
-            libyajl2 libcurl3-gnutls postgresql redis && \
+            libyajl2 libcurl3-gnutls libmnl0 postgresql \
+            redis libhiredis0.14 && \
     apt-get autoclean && \
     apt-get clean
 

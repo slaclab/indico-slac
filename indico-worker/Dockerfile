@@ -7,7 +7,7 @@ FROM python:3.9-buster
 
 LABEL edu.stanford.slac.indico.authors="salnikov@slac.stanford.edu"
 
-ENV INDICO_VERSION="3.0"
+ENV INDICO_VERSION="3.2.3"
 # empty string for latest indico-plugins compatible with INDICO_VERSION
 ENV INDICO_PLUGINS_VERSION=""
 ENV INDICO_DIR=/opt/indico
