@@ -35,7 +35,7 @@ def main():
     wizard.config_dir_path = os.path.join(wizard.root_path, "etc")
     wizard.config_path = os.path.join(wizard.config_dir_path, "indico.conf")
     wizard.indico_url = "https://indico.example.com/"
-    wizard.db_uri = "postgres://indico:password@indico-db/indico"
+    wizard.db_uri = "postgres://indico:{{password}}@indico-db/indico"
     wizard.redis_uri_celery = "redis://indico-redis:6379/0"
     wizard.redis_uri_cache = "redis://indico-redis:6379/1"
     wizard.contact_email = "indico@example.com"
