@@ -94,7 +94,7 @@ check the container name from the output of `docker-compose run`:
     docker exec -ti indico-slac_indico-db_run_4108e9220799 psql -U postgres
     postgres=#
     -- and run these commands:
-    CREATE ROLE indico WITH CREATEDB LOGIN PASSWORD 'indico-db-password';
+    CREATE ROLE indico WITH CREATEDB LOGIN PASSWORD '{{make-safe-password}}';
     CREATE DATABASE indico WITH OWNER=indico;
     \connect indico
     CREATE EXTENSION unaccent;
